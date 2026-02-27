@@ -74,13 +74,13 @@ import { exportQuiz, importQuiz as importQuizFile } from '~/utils/export'
 import type { Quiz } from '~~/shared/types/quiz'
 
 const { quiz, setDisplay, importQuizData, resetQuiz } = useQuizStore()
-const { broadcast } = useBroadcastSync()
+const { push } = useSupabaseSync()
 const { isRevealing, isComplete, revealedCount, totalTeams, startReveal, revealNext, autoReveal, exitReveal } = useFinalReveal()
 const fileInput = ref<HTMLInputElement | null>(null)
 
 function toggleVisibility() {
   setDisplay({ visible: !quiz.value.display.visible })
-  broadcast()
+  push()
 }
 
 function handleExport() {
@@ -97,7 +97,7 @@ async function handleImport(event: Event) {
   try {
     const data = await importQuizFile(file)
     importQuizData(data)
-    broadcast()
+    push()
   }
   catch (e) {
     alert((e as Error).message)
@@ -107,7 +107,7 @@ async function handleImport(event: Event) {
 function handleReset() {
   if (confirm('Naozaj chceš resetovať celý kvíz? Všetky dáta budú vymazané.')) {
     resetQuiz()
-    broadcast()
+    push()
   }
 }
 </script>

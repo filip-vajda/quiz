@@ -7,7 +7,15 @@ export interface Quiz {
   currentRound: number
   display: DisplayState
   createdAt: number
-  expiresAt: number
+  expiresAt?: number
+}
+
+export interface QuizSummary {
+  id: string
+  name: string
+  teamCount: number
+  winner: string
+  createdAt: string
 }
 
 export interface Team {

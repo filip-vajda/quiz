@@ -2,7 +2,7 @@ export function useFinalReveal() {
   const { quiz } = useQuizStore()
   const { rankings } = useLeaderboard()
   const { setDisplay } = useQuizStore()
-  const { broadcast } = useBroadcastSync()
+  const { push } = useSupabaseSync()
 
   let timer: ReturnType<typeof setTimeout> | null = null
 
@@ -28,13 +28,13 @@ export function useFinalReveal() {
 
   function startReveal() {
     setDisplay({ revealMode: true, revealedPosition: 0, visible: true })
-    broadcast()
+    push()
   }
 
   function revealNext() {
     if (revealedCount.value >= totalTeams.value) return
     setDisplay({ revealedPosition: revealedCount.value + 1 })
-    broadcast()
+    push()
   }
 
   function autoReveal(delayMs = 3000) {
@@ -62,7 +62,7 @@ export function useFinalReveal() {
   function exitReveal() {
     stopAuto()
     setDisplay({ revealMode: false, revealedPosition: 0 })
-    broadcast()
+    push()
   }
 
   return {

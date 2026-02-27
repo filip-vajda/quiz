@@ -1,14 +1,11 @@
 import type { Quiz, Team, DisplayState } from '~~/shared/types/quiz'
 import { saveQuiz, loadQuiz, clearQuiz } from '~/utils/storage'
 
-const TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000
-
 function generateId(): string {
   return Math.random().toString(36).substring(2, 10)
 }
 
 function createEmptyQuiz(): Quiz {
-  const now = Date.now()
   return {
     id: generateId(),
     name: '',
@@ -21,8 +18,7 @@ function createEmptyQuiz(): Quiz {
       revealMode: false,
       revealedPosition: 0,
     },
-    createdAt: now,
-    expiresAt: now + TWENTY_FOUR_HOURS,
+    createdAt: Date.now(),
   }
 }
 
@@ -30,13 +26,52 @@ const quiz = ref<Quiz>(createEmptyQuiz())
 let initialized = false
 
 export function useQuizStore() {
-  function init() {
-    if (initialized) return
+  function init(quizId?: string) {
+    if (initialized && !quizId) return
     initialized = true
+
+    if (quizId) {
+      // When loading from Supabase, fetch is handled externally
+      // and quiz is set via loadFromRemote
+      const saved = loadQuiz<Quiz>()
+      if (saved && saved.id === quizId) {
+        quiz.value = saved
+      }
+      return
+    }
+
     const saved = loadQuiz<Quiz>()
     if (saved) {
       quiz.value = saved
     }
+  }
+
+  async function loadFromRemote(quizId: string): Promise<boolean> {
+    const { fetchQuiz } = useSupabaseSync()
+    const remote = await fetchQuiz(quizId)
+    if (remote) {
+      quiz.value = remote
+      persist()
+      return true
+    }
+    return false
+  }
+
+  async function createNewQuiz(): Promise<Quiz> {
+    const newQuiz = createEmptyQuiz()
+    quiz.value = newQuiz
+    persist()
+
+    // Push to Supabase immediately (no debounce)
+    const client = useSupabaseClient()
+    const { mapQuizToRow } = useSupabaseSync()
+    const row = mapQuizToRow(newQuiz)
+    const { error } = await client
+      .from('quizzes')
+      .insert({ ...row, updated_at: new Date().toISOString() })
+    if (error) console.error('Failed to create quiz in Supabase:', error.message)
+
+    return newQuiz
   }
 
   function persist() {
@@ -106,8 +141,6 @@ export function useQuizStore() {
   // Import full quiz
   function importQuizData(data: Quiz) {
     quiz.value = data
-    // Refresh expiry
-    quiz.value.expiresAt = Date.now() + TWENTY_FOUR_HOURS
     persist()
   }
 
@@ -122,6 +155,8 @@ export function useQuizStore() {
     quiz: readonly(quiz) as Readonly<Ref<Quiz>>,
     quizWritable: quiz,
     init,
+    loadFromRemote,
+    createNewQuiz,
     persist,
     setQuizName,
     setRoundCount,

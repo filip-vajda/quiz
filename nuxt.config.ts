@@ -7,7 +7,16 @@ export default defineNuxtConfig({
     '~/assets/css/main.css',
     '~/assets/css/animations.css',
   ],
-  modules: ['@nuxtjs/google-fonts'],
+  modules: ['@nuxtjs/google-fonts', '@nuxtjs/supabase'],
+  supabase: {
+    redirectOptions: {
+      login: '',
+      callback: '',
+      include: undefined,
+      exclude: ['/*'],
+      saveRedirectToCookie: false,
+    },
+  },
   googleFonts: {
     families: {
       Inter: [400, 500, 600, 700, 800],

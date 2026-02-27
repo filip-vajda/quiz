@@ -28,17 +28,31 @@
 <script setup lang="ts">
 useHead({ title: 'Refresher Pub Quiz' })
 
-const { quiz, init } = useQuizStore()
-const { initChannel, listen, destroyChannel } = useBroadcastSync()
+const route = useRoute()
+const { quiz, init, loadFromRemote } = useQuizStore()
+const { subscribe, unsubscribe } = useSupabaseSync()
 
-onMounted(() => {
-  init()
-  initChannel()
-  listen()
+onMounted(async () => {
+  const quizId = route.query.quiz as string | undefined
+
+  if (quizId) {
+    init(quizId)
+    // Try to load from Supabase if localStorage doesn't have this quiz
+    if (quiz.value.id !== quizId) {
+      await loadFromRemote(quizId)
+    }
+    subscribe(quizId)
+  } else {
+    // Fallback: load from localStorage (backwards compat)
+    init()
+    if (quiz.value.id) {
+      subscribe(quiz.value.id)
+    }
+  }
 })
 
 onUnmounted(() => {
-  destroyChannel()
+  unsubscribe()
 })
 </script>
 
