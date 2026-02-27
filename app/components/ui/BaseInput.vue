@@ -36,7 +36,6 @@ defineEmits<{
 }
 
 .base-input__label {
-  font-size: 0.8rem;
   font-weight: 500;
   color: var(--text-muted);
 }
@@ -47,7 +46,6 @@ defineEmits<{
   border-radius: var(--radius);
   padding: 10px 12px;
   font-family: inherit;
-  font-size: 0.9rem;
   color: var(--text);
   outline: none;
   transition: border-color var(--transition);

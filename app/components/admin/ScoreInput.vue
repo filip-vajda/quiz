@@ -57,7 +57,6 @@ function handleScoreChange(teamId: string, roundIndex: number, event: Event) {
 <style scoped>
 .empty {
   color: var(--text-muted);
-  font-size: 0.9rem;
 }
 
 .round-tabs {
@@ -74,7 +73,6 @@ function handleScoreChange(teamId: string, roundIndex: number, event: Event) {
   background: transparent;
   color: var(--text-muted);
   font-family: inherit;
-  font-size: 0.8rem;
   font-weight: 500;
   cursor: pointer;
   transition: all var(--transition);
@@ -116,7 +114,6 @@ function handleScoreChange(teamId: string, roundIndex: number, event: Event) {
   border-radius: var(--radius);
   padding: 8px 12px;
   font-family: inherit;
-  font-size: 0.9rem;
   color: var(--text);
   text-align: center;
   outline: none;

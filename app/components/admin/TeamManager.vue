@@ -58,7 +58,6 @@ function handleAdd() {
   border-radius: var(--radius);
   padding: 8px 12px;
   font-family: inherit;
-  font-size: 0.9rem;
   color: var(--text);
   outline: none;
   transition: border-color var(--transition);
